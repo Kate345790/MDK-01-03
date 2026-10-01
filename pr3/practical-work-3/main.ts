@@ -1,9 +1,10 @@
-type LetterGrade = 'A' | 'B' | 'C' | 'D' | 'F' | 'Ошибка: некорректная оценка';
+import * as readline from 'readline';
+
+type LetterGrade = 'A' | 'B' | 'C' | 'D' | 'F' | 'Ошибка';
 
 function convertGrade(grade: number): LetterGrade {
-
-  if (!Number.isInteger(grade) || grade < 1 || grade > 5) {
-    return 'Ошибка: некорректная оценка';
+  if (!Number.isInteger(grade)) {
+    return 'Ошибка';
   }
 
   switch (grade) {
@@ -18,24 +19,37 @@ function convertGrade(grade: number): LetterGrade {
     case 1:
       return 'F';
     default:
-      return 'Ошибка: некорректная оценка';
+      return 'Ошибка';
   }
 }
 
-function getExamResult(letter: LetterGrade): string {
-
+function getStatus(letter: LetterGrade): string {
   return (letter === 'A' || letter === 'B' || letter === 'C')
     ? 'Зачтено'
     : 'Не зачтено / Пересдача';
 }
 
-const testGrades: number[] = [5, 4, 3, 2, 1, 0, 6, 4.5];
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-console.log('=== Результаты перевода оценок (Вариант 8) ===\n');
+rl.question('Введите числовую оценку (от 1 до 5): ', (answer: string) => {
+  const grade = Number(answer.trim());
 
-for (const grade of testGrades) {
-  const letter = convertGrade(grade);
-  const status = letter.startsWith('Ошибка') ? '—' : getExamResult(letter);
-  
-  console.log(`Оценка: ${grade}  ->  Буква: [${letter}]  |  Статус: ${status}`);
-}
+  if (isNaN(grade)) {
+    console.log('Ошибка: необходимо ввести число!');
+  } else {
+    const letter = convertGrade(grade);
+    
+    if (letter === 'Ошибка') {
+      console.log(`[Ошибка]: Оценка должна быть целым числом от 1 до 5! Вы ввели: ${grade}`);
+    } else {
+      console.log(`\nРезультат:`);
+      console.log(`Буквенная оценка: [${letter}]`);
+      console.log(`Статус: ${getStatus(letter)}`);
+    }
+  }
+
+  rl.close();
+});
